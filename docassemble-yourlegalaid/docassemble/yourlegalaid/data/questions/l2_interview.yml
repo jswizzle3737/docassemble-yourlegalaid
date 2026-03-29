@@ -1,0 +1,125 @@
+---
+include:
+  - shared_fields.yml
+---
+metadata:
+  title: L2 – Application to End Tenancy and Evict (Other Reasons)
+  short title: L2 Application
+  revision_date: 2026-03-29
+---
+mandatory: True
+code: |
+  form_type = 'L2'
+  form_fee = 201
+---
+mandatory: True
+question: |
+  ## L2 – Application to End Tenancy
+  ### Eviction for Reasons Other Than Non-Payment
+
+  You must have already served a notice (N5, N7, N8, N12, or N13) before
+  filing this application.
+
+  **Time:** ~10 minutes | **Fee:** $201
+subquestion: |
+  ${ disclaimer_template }
+field: intro_screen_seen
+buttons:
+  - Begin Interview: continue
+---
+question: |
+  Landlord Information
+fields:
+  - First Name: landlord.name.first
+  - Last Name: landlord.name.last
+  - Phone Number: landlord.phone
+    required: False
+  - Street Address: landlord.address
+  - City: landlord.city
+    default: Toronto
+  - Postal Code: landlord.postal_code
+---
+question: |
+  Tenant Information
+fields:
+  - First Name: tenant.name.first
+  - Last Name: tenant.name.last
+---
+question: |
+  Which notice did you serve?
+fields:
+  - Notice type: prior_notice_type
+    choices:
+      - "N5 – Interfering with Others / Damage"
+      - "N7 – Serious Problems / Illegal Act"
+      - "N8 – End of Term (Persistent Late Payment / Repeat N5)"
+      - "N12 – Landlord's Own Use"
+      - "N13 – Demolition, Conversion, or Repairs"
+  - Date the notice was served: notice_service_date
+    datatype: date
+  - Termination date on the notice: notice_termination_date
+    datatype: date
+  - Method of service: notice_service_method
+    choices:
+      - Handed to the tenant in person
+      - Left in the tenant's mailbox
+      - Slid under the door
+      - Sent by mail
+      - Sent by courier
+---
+question: |
+  Details
+subquestion: |
+  Describe why you are seeking eviction and any relevant facts since
+  serving the notice.
+fields:
+  - Details: l2_details
+    datatype: area
+    rows: 8
+---
+question: |
+  What are you requesting?
+fields:
+  - Requests: l2_requests
+    datatype: checkboxes
+    choices:
+      - An order to terminate the tenancy and evict the tenant
+      - An order for the tenant to pay compensation for damages
+      - An order for the tenant to pay the LTB filing fee ($201)
+    none of the above: False
+  - Amount of damages claimed: l2_damages
+    datatype: currency
+    required: False
+---
+mandatory: True
+question: |
+  ## Review Your L2 Application
+
+  **Landlord:** ${ landlord.name }
+  **Tenant:** ${ tenant.name }
+  **Rental Unit:** ${ rental_unit.address }, ${ rental_unit.city }
+
+  **Based On:** ${ prior_notice_type }
+  **Notice Served:** ${ notice_service_date }
+  **Termination Date:** ${ notice_termination_date }
+field: review_complete
+buttons:
+  - Generate L2: continue
+  - Start Over: restart
+---
+mandatory: True
+question: |
+  ## Your L2 Application is Ready
+subquestion: |
+  **Next Steps:**
+
+  1. Download and file with the LTB ($201 filing fee)
+  2. Serve a copy on the tenant
+  3. Attend the hearing — bring the original notice, proof of service,
+     and all supporting evidence
+
+  ${ disclaimer_template }
+buttons:
+  - Download PDF: exit
+    url: https://yourlegalaid.ca/thank-you/
+  - Start Another Form: restart

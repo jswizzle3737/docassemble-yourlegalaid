@@ -1,0 +1,80 @@
+name: New LTB Form Interview
+description: Request a new Ontario LTB form interview to be built or imported
+title: "[Form] Add {FORM_CODE} interview"
+labels: ["jules", "new-form"]
+assignees: []
+
+body:
+  - type: dropdown
+    id: form_code
+    attributes:
+      label: Form Code
+      description: Which LTB form needs an interview?
+      options:
+        - N4 – Non-payment of Rent
+        - N5 – Damage or Interference
+        - N6 – Illegal Act
+        - N7 – Danger to Safety
+        - N8 – Persistent Late Rent
+        - N9 – Tenant's Notice to End
+        - N11 – Agreement to End Tenancy
+        - N12 – Landlord Personal Use
+        - N13 – Demolition / Renovation
+        - L1 – Application to Evict + Collect
+        - L2 – Application to End Tenancy
+        - T1 – Tenant Rebate
+        - T2 – Tenant Rights
+        - T5 – Landlord Gave Notice in Bad Faith
+        - T6 – Maintenance
+        - CS – Consent and Settlement Order
+        - Other (specify below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: pdf_link
+    attributes:
+      label: Official PDF / Source
+      description: |
+        Link to the official Tribunals Ontario PDF, or attach it here.
+        Jules will OCR the PDF to extract field names and layout.
+      placeholder: "https://tribunalsontario.ca/ltb/forms/"
+    validations:
+      required: true
+
+  - type: textarea
+    id: fields
+    attributes:
+      label: Key Fields (if known)
+      description: |
+        List the fields you know the form requires, one per line.
+        Jules will fill in any gaps from the PDF. Skip if attaching PDF.
+      placeholder: |
+        landlord name
+        tenant name
+        rental unit address
+        termination date
+        reason for notice
+    validations:
+      required: false
+
+  - type: textarea
+    id: special_logic
+    attributes:
+      label: Conditional Logic or Special Rules
+      description: |
+        Describe any branching logic the interview should handle.
+        E.g. "If the tenant has a fixed-term lease, show an extra question about..."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: deliverables
+    attributes:
+      label: Deliverables Required
+      options:
+        - label: YAML interview file
+          required: true
+        - label: DOCX Jinja2 template (matching official form layout)
+        - label: ALKiln test scenario
+        - label: WordPress landing page update (add to /library/)

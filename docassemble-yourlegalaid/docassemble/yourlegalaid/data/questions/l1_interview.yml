@@ -1,0 +1,132 @@
+---
+include:
+  - shared_fields.yml
+---
+metadata:
+  title: L1 – Application to Evict for Non-Payment of Rent
+  short title: L1 Application
+  revision_date: 2026-03-29
+---
+mandatory: True
+code: |
+  form_type = 'L1'
+  form_fee = 201
+---
+mandatory: True
+question: |
+  ## L1 – Application to Evict a Tenant
+  ### Non-Payment of Rent & Collect Rent Arrears
+
+  You must have already served an **N4 Notice** before filing this application.
+  The termination date on the N4 must have passed.
+
+  **Time:** ~15 minutes | **Fee:** $201
+subquestion: |
+  ${ disclaimer_template }
+field: intro_screen_seen
+buttons:
+  - Begin Interview: continue
+---
+question: |
+  Landlord Information
+fields:
+  - First Name: landlord.name.first
+  - Last Name: landlord.name.last
+  - Phone Number: landlord.phone
+    required: False
+  - Email: landlord.email
+    datatype: email
+    required: False
+  - Street Address: landlord.address
+  - City: landlord.city
+    default: Toronto
+  - Postal Code: landlord.postal_code
+---
+question: |
+  Tenant Information
+fields:
+  - First Name: tenant.name.first
+  - Last Name: tenant.name.last
+  - Are there additional tenants on the lease?: has_additional_tenants
+    datatype: yesnoradio
+  - Names of additional tenants: additional_tenants
+    datatype: area
+    show if: has_additional_tenants
+    rows: 3
+---
+question: |
+  N4 Notice Details
+fields:
+  - Date the N4 was served: n4_service_date
+    datatype: date
+  - Termination date on the N4: n4_termination_date
+    datatype: date
+  - How was the N4 served?: n4_service_method
+    choices:
+      - Handed to the tenant in person
+      - Left in the tenant's mailbox
+      - Slid under the door
+      - Sent by mail
+      - Sent by courier
+---
+question: |
+  Rent Arrears
+fields:
+  - Total rent arrears as of today: total_arrears
+    datatype: currency
+  - Per-day rent amount: daily_rent
+    datatype: currency
+    help: |
+      Calculate: monthly rent / number of days in the month.
+  - Has the tenant made any partial payments since the N4?: partial_payments
+    datatype: yesnoradio
+  - Amount of partial payments: partial_payment_amount
+    datatype: currency
+    show if: partial_payments
+---
+question: |
+  What are you requesting?
+fields:
+  - Requests: l1_requests
+    datatype: checkboxes
+    choices:
+      - An order to evict the tenant
+      - An order for the tenant to pay rent arrears
+      - An order for the tenant to pay the LTB filing fee ($201)
+      - An order for the daily rate of compensation until the tenant moves out
+    none of the above: False
+---
+mandatory: True
+question: |
+  ## Review Your L1 Application
+
+  **Landlord:** ${ landlord.name }
+  **Tenant:** ${ tenant.name }
+  **Rental Unit:** ${ rental_unit.address }, ${ rental_unit.city }
+
+  **Monthly Rent:** $${ "%.2f" % monthly_rent }
+  **Total Arrears:** $${ "%.2f" % total_arrears }
+  **N4 Served:** ${ n4_service_date }
+  **N4 Termination Date:** ${ n4_termination_date }
+field: review_complete
+buttons:
+  - Generate L1: continue
+  - Start Over: restart
+---
+mandatory: True
+question: |
+  ## Your L1 Application is Ready
+subquestion: |
+  **Next Steps:**
+
+  1. Download and file with the LTB ($201 filing fee)
+  2. Serve a copy on the tenant
+  3. Attend the hearing — bring your N4, proof of service, and rent ledger
+  4. The tenant can void the L1 by paying all arrears + filing fee before
+     the hearing
+
+  ${ disclaimer_template }
+buttons:
+  - Download PDF: exit
+    url: https://yourlegalaid.ca/thank-you/
+  - Start Another Form: restart

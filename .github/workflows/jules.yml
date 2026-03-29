@@ -1,0 +1,38 @@
+name: Jules AI Coding Agent
+
+# Jules triggers when an issue is labeled "jules".
+# Jules will clone the repo to a Cloud VM, read AGENTS.md,
+# develop a plan, implement the changes, and open a PR.
+#
+# Setup required:
+#   1. Go to jules.google → connect your GitHub account
+#   2. Add JULES_API_KEY to repo Settings → Secrets → Actions
+#   3. Label any issue with "jules" to trigger
+
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+
+jobs:
+  jules:
+    name: Assign to Jules
+    # Only run when the "jules" label is applied, or when a comment
+    # in a "jules"-labeled issue mentions @jules
+    if: |
+      (github.event_name == 'issues' && github.event.label.name == 'jules') ||
+      (github.event_name == 'issue_comment' &&
+       contains(github.event.issue.labels.*.name, 'jules') &&
+       contains(github.event.comment.body, '@jules'))
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Trigger Jules
+        uses: google-labs-code/jules-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          jules_api_key: ${{ secrets.JULES_API_KEY }}

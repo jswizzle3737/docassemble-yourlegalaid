@@ -1,0 +1,86 @@
+---
+# Shared field definitions used across all YourLegalAid interviews
+comment: |
+  Common fields and blocks shared by all LTB form interviews.
+  Import this file in each interview with:
+    include:
+      - shared_fields.yml
+---
+metadata:
+  title: YourLegalAid
+  short title: YourLegalAid
+  logo: |
+    <span style="font-weight:700;color:#D4AF37;">YourLegalAid</span><span style="color:#999;">.ca</span>
+  exit url: https://yourlegalaid.ca
+  exit label: Back to YourLegalAid
+---
+features:
+  css: |
+    <style>
+      :root {
+        --primary: #D4AF37;
+        --dark: #050505;
+        --text: #333;
+      }
+      .da-page-header { background: #050505 !important; }
+      .btn-primary { background-color: #D4AF37 !important; border-color: #D4AF37 !important; color: #050505 !important; font-weight: 700; }
+      .btn-primary:hover { background-color: #c49b2f !important; border-color: #c49b2f !important; }
+      .da-subquestion { color: #666; }
+    </style>
+  question back button: True
+  navigation back button: False
+---
+objects:
+  - tenant: Individual
+  - landlord: Individual
+  - rental_unit: Thing
+---
+generic object: Individual
+question: |
+  What is ${ x.object_possessive('name') }?
+fields:
+  - First Name: x.name.first
+  - Last Name: x.name.last
+---
+question: |
+  What is the rental unit address?
+fields:
+  - Street Address: rental_unit.address
+  - Unit/Apt Number: rental_unit.unit
+    required: False
+  - City: rental_unit.city
+    default: Toronto
+  - Province: rental_unit.province
+    default: Ontario
+    choices:
+      - Ontario
+  - Postal Code: rental_unit.postal_code
+---
+question: |
+  When did the tenancy begin?
+fields:
+  - Tenancy Start Date: tenancy_start_date
+    datatype: date
+---
+question: |
+  What is the monthly rent amount?
+fields:
+  - Monthly Rent: monthly_rent
+    datatype: currency
+    min: 0
+---
+question: |
+  When is rent due each month?
+fields:
+  - Rent Due Date: rent_due_day
+    datatype: integer
+    min: 1
+    max: 31
+    default: 1
+---
+template: disclaimer_template
+content: |
+  **Important Notice:** This document was prepared using automated legal
+  software provided by YourLegalAid.ca. It does not constitute legal advice.
+  For complex matters, consult a licensed Ontario paralegal or lawyer.
+  YourLegalAid.ca is not a law firm.

@@ -1,0 +1,122 @@
+---
+include:
+  - shared_fields.yml
+---
+metadata:
+  title: N12 – Notice to End Tenancy for Landlord's Own Use
+  short title: N12 Notice
+  revision_date: 2026-03-29
+---
+mandatory: True
+code: |
+  form_type = 'N12'
+  form_fee = 49
+---
+mandatory: True
+question: |
+  ## N12 – Notice to End Tenancy
+  ### Landlord's Own Use
+
+  Use this notice when you, a purchaser, or a close family member needs
+  the rental unit. You must pay **one month's rent** as compensation.
+
+  **Time:** ~5 minutes | **Fee:** $49
+subquestion: |
+  ${ disclaimer_template }
+field: intro_screen_seen
+buttons:
+  - Begin Interview: continue
+---
+question: |
+  Landlord Information
+fields:
+  - First Name: landlord.name.first
+  - Last Name: landlord.name.last
+  - Street Address: landlord.address
+  - City: landlord.city
+    default: Toronto
+  - Postal Code: landlord.postal_code
+---
+question: |
+  Who will be moving into the unit?
+fields:
+  - Person moving in: n12_person
+    choices:
+      - The landlord (myself)
+      - Landlord's spouse
+      - Landlord's child
+      - Landlord's parent
+      - A caregiver for the landlord or family member
+      - A purchaser of the property
+      - A purchaser's spouse, child, or parent
+  - Name of person moving in: n12_person_name
+  - Relationship to landlord: n12_relationship
+    show if:
+      variable: n12_person
+      is: A purchaser of the property
+---
+question: |
+  Termination Date
+subquestion: |
+  The termination date must be at the **end of a rental period** and at
+  least **60 days** after service.
+
+  **Reminder:** You must pay the tenant compensation equal to **one month's
+  rent** (${ currency(monthly_rent) }) before the termination date.
+fields:
+  - Termination Date: termination_date
+    datatype: date
+---
+question: |
+  Compensation Confirmation
+subquestion: |
+  The law requires you to pay the tenant **$${ "%.2f" % monthly_rent }**
+  (one month's rent) as compensation **before the termination date**.
+fields:
+  - "I understand I must pay compensation before the termination date": compensation_confirmed
+    datatype: yesno
+    validate: |
+      lambda y: True if y else validation_message("You must confirm you understand the compensation requirement.")
+---
+question: |
+  Certificate of Service
+fields:
+  - Method of Service: service_method
+    choices:
+      - Handed to the tenant in person
+      - Left in the tenant's mailbox
+      - Slid under the door of the rental unit
+      - Sent by mail
+      - Sent by courier
+---
+mandatory: True
+question: |
+  ## Review Your N12 Notice
+
+  **Landlord:** ${ landlord.name }
+  **Tenant:** ${ tenant.name }
+  **Rental Unit:** ${ rental_unit.address }, ${ rental_unit.city }
+  **Person Moving In:** ${ n12_person_name } (${ n12_person })
+  **Compensation:** $${ "%.2f" % monthly_rent }
+  **Termination Date:** ${ termination_date }
+field: review_complete
+buttons:
+  - Generate N12: continue
+  - Start Over: restart
+---
+mandatory: True
+question: |
+  ## Your N12 Notice is Ready
+subquestion: |
+  **Critical Reminders:**
+
+  1. Pay the tenant **$${ "%.2f" % monthly_rent }** before ${ termination_date }
+  2. Serve the notice using: *${ service_method }*
+  3. The person named must actually move in and live there for at least **12 months**
+  4. Bad faith N12 evictions carry penalties up to **$35,000** under the RTA
+
+  ${ disclaimer_template }
+buttons:
+  - Download PDF: exit
+    url: https://yourlegalaid.ca/thank-you/
+  - Start Another Form: restart

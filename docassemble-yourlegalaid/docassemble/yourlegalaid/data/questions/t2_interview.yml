@@ -1,0 +1,141 @@
+---
+include:
+  - shared_fields.yml
+---
+metadata:
+  title: T2 – Tenant Rights Application
+  short title: T2 Application
+  revision_date: 2026-03-29
+---
+mandatory: True
+code: |
+  form_type = 'T2'
+  form_fee = 53
+---
+mandatory: True
+question: |
+  ## T2 – Tenant Rights Application
+
+  Use this form when your landlord has violated your rights — illegal entry,
+  harassment, interference with reasonable enjoyment, or withholding vital services.
+
+  **Time:** ~10 minutes | **Fee:** $53
+subquestion: |
+  ${ disclaimer_template }
+field: intro_screen_seen
+buttons:
+  - Begin Interview: continue
+---
+question: |
+  Your Information (Tenant)
+fields:
+  - First Name: tenant.name.first
+  - Last Name: tenant.name.last
+  - Phone Number: tenant.phone
+    required: False
+  - Email: tenant.email
+    datatype: email
+    required: False
+---
+question: |
+  Landlord Information
+fields:
+  - First Name: landlord.name.first
+  - Last Name: landlord.name.last
+  - Phone Number: landlord.phone
+    required: False
+  - Street Address: landlord.address
+  - City: landlord.city
+    default: Toronto
+  - Postal Code: landlord.postal_code
+---
+question: |
+  What did the landlord do?
+fields:
+  - Reasons: t2_reasons
+    datatype: checkboxes
+    choices:
+      - Entered the rental unit without proper notice or consent
+      - Changed the locks or withheld a key
+      - Harassed, threatened, or coerced the tenant
+      - Substantially interfered with the tenant's reasonable enjoyment
+      - Withheld vital services (heat, hydro, water, gas)
+      - Attempted an illegal eviction
+    none of the above: False
+---
+question: |
+  Describe each incident
+fields:
+  - Description of incidents: incident_description
+    datatype: area
+    rows: 8
+  - Date of most recent incident: most_recent_date
+    datatype: date
+---
+question: |
+  Have you made written complaints to the landlord?
+fields:
+  - Written complaints?: has_complaints
+    datatype: yesnoradio
+  - Describe the complaints and dates: complaint_details
+    datatype: area
+    rows: 4
+    show if: has_complaints
+---
+question: |
+  What remedies are you requesting?
+fields:
+  - Remedies: t2_remedies
+    datatype: checkboxes
+    choices:
+      - An order that the landlord stop the behaviour
+      - A rent abatement (reduction in rent for the period affected)
+      - An order for the landlord to pay damages
+      - An administrative fine against the landlord
+      - Authorization to change the locks
+    none of the above: False
+  - Amount of damages claimed (if any): damages_amount
+    datatype: currency
+    required: False
+---
+mandatory: True
+question: |
+  ## Review Your T2 Application
+
+  **Tenant:** ${ tenant.name }
+  **Landlord:** ${ landlord.name }
+  **Rental Unit:** ${ rental_unit.address }, ${ rental_unit.city }
+
+  **Reasons:**
+  % for reason in t2_reasons.true_values():
+  - ${ reason }
+  % endfor
+
+  **Most Recent Incident:** ${ most_recent_date }
+
+  **Remedies Requested:**
+  % for remedy in t2_remedies.true_values():
+  - ${ remedy }
+  % endfor
+field: review_complete
+buttons:
+  - Generate T2: continue
+  - Start Over: restart
+---
+mandatory: True
+question: |
+  ## Your T2 Application is Ready
+subquestion: |
+  **Next Steps:**
+
+  1. Download your completed T2 form
+  2. File with the LTB online or in person
+  3. Pay the LTB filing fee ($53)
+  4. Serve a copy on your landlord
+  5. Attend the hearing with your evidence
+
+  ${ disclaimer_template }
+buttons:
+  - Download PDF: exit
+    url: https://yourlegalaid.ca/thank-you/
+  - Start Another Form: restart

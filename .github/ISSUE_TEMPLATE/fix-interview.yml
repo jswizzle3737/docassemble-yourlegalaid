@@ -1,0 +1,38 @@
+name: Fix Interview Bug
+description: Report a bug or incorrect behaviour in an existing interview
+title: "[Fix] {FORM_CODE} – {short description}"
+labels: ["jules", "bug"]
+
+body:
+  - type: dropdown
+    id: form_code
+    attributes:
+      label: Which interview?
+      options:
+        - N4, N5, N7, N8, N12, N13, L1, L2, T1, T2, T6, CS, shared_fields
+    validations:
+      required: true
+
+  - type: textarea
+    id: what_happened
+    attributes:
+      label: What went wrong?
+      placeholder: "e.g. The termination date is not being validated as at least 14 days after service"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open N4 interview
+        2. Enter rent period dates...
+        3. Termination date field accepts dates < 14 days

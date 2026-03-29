@@ -1,0 +1,166 @@
+---
+include:
+  - shared_fields.yml
+---
+metadata:
+  title: N4 – Notice to End Tenancy for Non-Payment of Rent
+  short title: N4 Notice
+  description: Generate an N4 notice for non-payment of rent.
+  authors:
+    - name: YourLegalAid
+      organization: YourLegalAid.ca
+  revision_date: 2026-03-29
+---
+mandatory: True
+code: |
+  multi_user = True
+  form_type = 'N4'
+  form_fee = 49
+---
+mandatory: True
+question: |
+  ## N4 – Notice to End Tenancy
+  ### Non-Payment of Rent
+
+  This guided interview will help you prepare an **N4 Notice** to serve
+  on your tenant for non-payment of rent.
+
+  **Before you begin, you'll need:**
+
+  - Rental unit address
+  - Tenant name(s)
+  - Monthly rent amount and due date
+  - Period(s) of unpaid rent and amounts owed
+
+  **Time:** ~5 minutes | **Fee:** $49 (pay at download)
+subquestion: |
+  ${ disclaimer_template }
+field: intro_screen_seen
+buttons:
+  - Begin Interview: continue
+---
+question: |
+  Landlord Information
+fields:
+  - First Name: landlord.name.first
+  - Last Name: landlord.name.last
+  - Phone Number: landlord.phone
+    required: False
+  - Email: landlord.email
+    datatype: email
+    required: False
+  - Street Address: landlord.address
+  - City: landlord.city
+    default: Toronto
+  - Postal Code: landlord.postal_code
+---
+question: |
+  How many periods of unpaid rent are there?
+fields:
+  - Number of periods: num_rent_periods
+    datatype: integer
+    min: 1
+    max: 24
+    default: 1
+---
+question: |
+  Rent Owed — Period ${ i + 1 }
+fields:
+  - "From date": rent_periods[i].from_date
+    datatype: date
+  - "To date": rent_periods[i].to_date
+    datatype: date
+  - "Rent charged": rent_periods[i].rent_charged
+    datatype: currency
+  - "Rent paid": rent_periods[i].rent_paid
+    datatype: currency
+    default: 0
+---
+objects:
+  - rent_periods: DAList.using(object_type=DAObject, there_are_any=True)
+---
+code: |
+  rent_periods.there_are_any = True
+  if len(rent_periods) >= num_rent_periods:
+    rent_periods.there_is_another = False
+  else:
+    rent_periods.there_is_another = True
+---
+code: |
+  total_rent_owed = sum(
+    (p.rent_charged - p.rent_paid) for p in rent_periods
+  )
+---
+question: |
+  Termination Date
+subquestion: |
+  The termination date must be at least **14 days** after you serve
+  this notice on the tenant.
+
+  Total rent owed: **$${ "%.2f" % total_rent_owed }**
+fields:
+  - Termination Date: termination_date
+    datatype: date
+---
+question: |
+  Certificate of Service
+subquestion: |
+  How will you serve this notice on the tenant?
+fields:
+  - Method of Service: service_method
+    choices:
+      - Handed to the tenant in person
+      - Left in the tenant's mailbox
+      - Slid under the door of the rental unit
+      - Sent by mail
+      - Sent by courier
+      - Left at the door in a sealed envelope
+      - Sent by email (if tenant consented in writing)
+      - Sent by fax (if tenant consented in writing)
+---
+mandatory: True
+question: |
+  ## Review Your N4 Notice
+
+  **Landlord:** ${ landlord.name }
+  **Tenant:** ${ tenant.name }
+  **Rental Unit:** ${ rental_unit.address }${ ', Unit ' + rental_unit.unit if rental_unit.unit else '' }, ${ rental_unit.city }
+
+  **Total Rent Owed:** $${ "%.2f" % total_rent_owed }
+  **Termination Date:** ${ termination_date }
+  **Service Method:** ${ service_method }
+
+  | Period | Charged | Paid | Owing |
+  |--------|---------|------|-------|
+  % for p in rent_periods:
+  | ${ p.from_date } to ${ p.to_date } | $${ "%.2f" % p.rent_charged } | $${ "%.2f" % p.rent_paid } | $${ "%.2f" % (p.rent_charged - p.rent_paid) } |
+  % endfor
+
+subquestion: |
+  Please review the information above carefully. If everything is correct,
+  click **Generate N4** to create your document.
+field: review_complete
+buttons:
+  - Generate N4: continue
+  - Start Over: restart
+---
+mandatory: True
+question: |
+  ## Your N4 Notice is Ready
+
+  Your N4 – Notice to End Tenancy for Non-Payment of Rent has been
+  generated successfully.
+subquestion: |
+  **Next Steps:**
+
+  1. Download your completed N4 form
+  2. Serve the notice on your tenant using: *${ service_method }*
+  3. Keep a copy for your records
+  4. If the tenant does not pay by ${ termination_date }, you may file
+     an [L1 Application](https://yourlegalaid.ca/forms-l1/) with the LTB
+
+  ${ disclaimer_template }
+buttons:
+  - Download PDF: exit
+    url: https://yourlegalaid.ca/thank-you/
+  - Start Another Form: restart

@@ -1,0 +1,149 @@
+---
+include:
+  - shared_fields.yml
+---
+metadata:
+  title: N5 – Notice to End Tenancy for Interfering with Others
+  short title: N5 Notice
+  description: Generate an N5 notice for interference, damage, or safety concerns.
+  revision_date: 2026-03-29
+---
+mandatory: True
+code: |
+  multi_user = True
+  form_type = 'N5'
+  form_fee = 49
+---
+mandatory: True
+question: |
+  ## N5 – Notice to End Tenancy
+  ### Interfering with Others, Damage, or Overcrowding
+
+  This interview will help you prepare an **N5 Notice** — a voidable notice
+  giving the tenant **20 days** to correct the behaviour.
+
+  **Time:** ~5 minutes | **Fee:** $49 (pay at download)
+subquestion: |
+  ${ disclaimer_template }
+field: intro_screen_seen
+buttons:
+  - Begin Interview: continue
+---
+question: |
+  Landlord Information
+fields:
+  - First Name: landlord.name.first
+  - Last Name: landlord.name.last
+  - Phone Number: landlord.phone
+    required: False
+  - Email: landlord.email
+    datatype: email
+    required: False
+  - Street Address: landlord.address
+  - City: landlord.city
+    default: Toronto
+  - Postal Code: landlord.postal_code
+---
+question: |
+  Reason for the N5 Notice
+subquestion: |
+  Select all reasons that apply.
+fields:
+  - Reasons: n5_reasons
+    datatype: checkboxes
+    choices:
+      - Substantially interfered with reasonable enjoyment of other tenants
+      - Substantially interfered with a lawful right, privilege, or interest of the landlord
+      - Caused wilful or negligent damage to the rental unit
+      - Caused wilful or negligent damage to the residential complex
+      - Too many persons living in the unit (overcrowding)
+      - Impaired safety of another person in the building
+    none of the above: False
+---
+question: |
+  Describe the incidents
+subquestion: |
+  Provide details of each incident including dates, times, and what happened.
+fields:
+  - Description of incidents: incident_description
+    datatype: area
+    rows: 8
+  - Date of most recent incident: most_recent_incident_date
+    datatype: date
+---
+question: |
+  Is there damage that needs to be repaired?
+fields:
+  - Damage requiring repair?: has_damage
+    datatype: yesnoradio
+  - Estimated repair cost: damage_cost
+    datatype: currency
+    show if: has_damage
+  - Description of damage: damage_description
+    datatype: area
+    show if: has_damage
+    rows: 4
+---
+question: |
+  Termination Date
+subquestion: |
+  The N5 is a **voidable notice**. The termination date must be at least
+  **20 days** after service. The tenant can void the notice by correcting
+  the problem within 7 days of receiving it.
+fields:
+  - Termination Date: termination_date
+    datatype: date
+---
+question: |
+  Certificate of Service
+fields:
+  - Method of Service: service_method
+    choices:
+      - Handed to the tenant in person
+      - Left in the tenant's mailbox
+      - Slid under the door of the rental unit
+      - Sent by mail
+      - Sent by courier
+      - Left at the door in a sealed envelope
+---
+mandatory: True
+question: |
+  ## Review Your N5 Notice
+
+  **Landlord:** ${ landlord.name }
+  **Tenant:** ${ tenant.name }
+  **Rental Unit:** ${ rental_unit.address }, ${ rental_unit.city }
+
+  **Reasons:**
+  % for reason in n5_reasons.true_values():
+  - ${ reason }
+  % endfor
+
+  **Most Recent Incident:** ${ most_recent_incident_date }
+  % if has_damage:
+  **Damage Cost:** $${ "%.2f" % damage_cost }
+  % endif
+  **Termination Date:** ${ termination_date }
+field: review_complete
+buttons:
+  - Generate N5: continue
+  - Start Over: restart
+---
+mandatory: True
+question: |
+  ## Your N5 Notice is Ready
+subquestion: |
+  **Next Steps:**
+
+  1. Download and serve the N5 on your tenant
+  2. The tenant has **7 days** to correct the behaviour
+  3. If the tenant does not correct within 7 days and the termination date
+     passes, you may file an [L2 Application](https://yourlegalaid.ca/forms-l2/)
+  4. If the tenant repeats the behaviour within 6 months, serve an
+     [N8 Notice](https://yourlegalaid.ca/forms-n8/)
+
+  ${ disclaimer_template }
+buttons:
+  - Download PDF: exit
+    url: https://yourlegalaid.ca/thank-you/
+  - Start Another Form: restart

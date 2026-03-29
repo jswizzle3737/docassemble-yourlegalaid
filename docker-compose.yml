@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  docassemble:
+    image: jhpyle/docassemble:latest
+    container_name: docassemble-yourlegalaid
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - da-config:/usr/share/docassemble/config
+      - da-log:/usr/share/docassemble/log
+      - da-backup:/usr/share/docassemble/backup
+      - da-files:/usr/share/docassemble/files
+      - da-postgres:/var/lib/postgresql
+    environment:
+      - DAHOSTNAME=interviews.yourlegalaid.ca
+      - DABACKUPDAYS=14
+      - TIMEZONE=America/Toronto
+      - DASTABLEVERSION=1
+    stop_grace_period: 60s
+
+volumes:
+  da-config:
+  da-log:
+  da-backup:
+  da-files:
+  da-postgres:

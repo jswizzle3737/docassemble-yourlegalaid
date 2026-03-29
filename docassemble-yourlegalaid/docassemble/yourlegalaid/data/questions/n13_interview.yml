@@ -1,0 +1,131 @@
+---
+include:
+  - shared_fields.yml
+---
+metadata:
+  title: N13 – Notice to End Tenancy for Demolition, Conversion, or Repairs
+  short title: N13 Notice
+  revision_date: 2026-03-29
+---
+mandatory: True
+code: |
+  form_type = 'N13'
+  form_fee = 49
+---
+mandatory: True
+question: |
+  ## N13 – Notice to End Tenancy
+  ### Demolition, Conversion, or Repairs
+
+  Use this notice when you need the unit vacated for demolition,
+  conversion to non-residential use, or extensive repairs requiring
+  a building permit and vacant possession.
+
+  **Time:** ~5 minutes | **Fee:** $49
+subquestion: |
+  ${ disclaimer_template }
+field: intro_screen_seen
+buttons:
+  - Begin Interview: continue
+---
+question: |
+  Landlord Information
+fields:
+  - First Name: landlord.name.first
+  - Last Name: landlord.name.last
+  - Street Address: landlord.address
+  - City: landlord.city
+    default: Toronto
+  - Postal Code: landlord.postal_code
+---
+question: |
+  Reason for the N13 Notice
+fields:
+  - Reason: n13_reason
+    choices:
+      - Demolition of the rental unit or building
+      - Conversion to non-residential use
+      - Extensive repairs or renovations requiring vacant possession
+  - Description of planned work: work_description
+    datatype: area
+    rows: 6
+---
+question: |
+  Building Permit
+fields:
+  - Have you obtained a building permit?: has_permit
+    datatype: yesnoradio
+  - Permit number: permit_number
+    show if: has_permit
+  - Date permit was issued: permit_date
+    datatype: date
+    show if: has_permit
+---
+question: |
+  Timeline
+fields:
+  - Estimated start date of work: work_start_date
+    datatype: date
+  - Estimated duration of work: work_duration
+    choices:
+      - Less than 3 months
+      - 3 to 6 months
+      - 6 to 12 months
+      - More than 12 months
+---
+question: |
+  Termination Date
+subquestion: |
+  Must be at the **end of a rental period** and at least **120 days**
+  after service for demolition/conversion, or **60 days** for repairs.
+
+  You must pay compensation equal to **one month's rent** or offer
+  the tenant another acceptable unit.
+fields:
+  - Termination Date: termination_date
+    datatype: date
+---
+question: |
+  Certificate of Service
+fields:
+  - Method of Service: service_method
+    choices:
+      - Handed to the tenant in person
+      - Left in the tenant's mailbox
+      - Slid under the door of the rental unit
+      - Sent by mail
+      - Sent by courier
+---
+mandatory: True
+question: |
+  ## Review Your N13 Notice
+
+  **Landlord:** ${ landlord.name }
+  **Tenant:** ${ tenant.name }
+  **Rental Unit:** ${ rental_unit.address }, ${ rental_unit.city }
+  **Reason:** ${ n13_reason }
+  % if has_permit:
+  **Permit #:** ${ permit_number }
+  % endif
+  **Termination Date:** ${ termination_date }
+field: review_complete
+buttons:
+  - Generate N13: continue
+  - Start Over: restart
+---
+mandatory: True
+question: |
+  ## Your N13 Notice is Ready
+subquestion: |
+  **Next Steps:**
+
+  1. Pay compensation before the termination date
+  2. Serve the notice on the tenant
+  3. The tenant has a **right of first refusal** to move back in after
+     repairs are completed (at the same rent)
+
+  ${ disclaimer_template }
+buttons:
+  - Download PDF: exit
+    url: https://yourlegalaid.ca/thank-you/
+  - Start Another Form: restart

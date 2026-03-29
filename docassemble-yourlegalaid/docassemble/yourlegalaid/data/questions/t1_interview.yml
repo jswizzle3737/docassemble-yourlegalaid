@@ -1,0 +1,144 @@
+---
+include:
+  - shared_fields.yml
+---
+metadata:
+  title: T1 – Tenant Application for a Rebate
+  short title: T1 Application
+  revision_date: 2026-03-29
+---
+mandatory: True
+code: |
+  form_type = 'T1'
+  form_fee = 53
+---
+mandatory: True
+question: |
+  ## T1 – Tenant Application for a Rebate
+  ### Money the Landlord Collected Illegally
+
+  Use this form if your landlord charged you money they were not
+  entitled to collect under the Residential Tenancies Act.
+
+  **Time:** ~10 minutes | **Fee:** $53
+subquestion: |
+  ${ disclaimer_template }
+field: intro_screen_seen
+buttons:
+  - Begin Interview: continue
+---
+question: |
+  Your Information (Tenant)
+fields:
+  - First Name: tenant.name.first
+  - Last Name: tenant.name.last
+  - Phone Number: tenant.phone
+    required: False
+  - Email: tenant.email
+    datatype: email
+    required: False
+---
+question: |
+  Landlord Information
+fields:
+  - First Name: landlord.name.first
+  - Last Name: landlord.name.last
+  - Phone Number: landlord.phone
+    required: False
+  - Street Address: landlord.address
+  - City: landlord.city
+    default: Toronto
+  - Postal Code: landlord.postal_code
+---
+question: |
+  What did the landlord collect illegally?
+subquestion: |
+  Select all that apply.
+fields:
+  - Reasons: t1_reasons
+    datatype: checkboxes
+    choices:
+      - Charged rent above the lawful amount (illegal rent increase)
+      - Collected a rent deposit exceeding one month's rent
+      - Charged fees not allowed under the RTA (e.g., admin fee, key deposit above cost)
+      - Failed to pay interest on the last month's rent deposit
+      - Retained the rent deposit after move-out without justification
+      - Collected an illegal charge related to the tenancy
+    none of the above: False
+---
+question: |
+  Amount collected illegally
+fields:
+  - Total amount collected illegally: illegal_amount
+    datatype: currency
+  - Date(s) the money was collected: collection_dates
+    datatype: area
+    rows: 3
+    help: |
+      List each date and amount. Example:
+      Jan 1, 2026 - $200 (admin fee)
+      Feb 1, 2026 - $50 (above guideline increase)
+---
+question: |
+  Do you have proof of payment?
+fields:
+  - Do you have receipts or proof?: has_proof
+    datatype: yesnoradio
+  - Describe your proof: proof_description
+    datatype: area
+    rows: 4
+    show if: has_proof
+---
+question: |
+  What remedies are you requesting?
+fields:
+  - Remedies: t1_remedies
+    datatype: checkboxes
+    choices:
+      - An order that the landlord pay back the money collected illegally
+      - An order for the LTB to determine the lawful rent
+      - An order to reduce the rent until the landlord makes the rebate
+      - An administrative fine against the landlord
+    none of the above: False
+---
+mandatory: True
+question: |
+  ## Review Your T1 Application
+
+  **Tenant:** ${ tenant.name }
+  **Landlord:** ${ landlord.name }
+  **Rental Unit:** ${ rental_unit.address }, ${ rental_unit.city }
+
+  **Amount Claimed:** $${ "%.2f" % illegal_amount }
+
+  **Reasons:**
+  % for reason in t1_reasons.true_values():
+  - ${ reason }
+  % endfor
+
+  **Remedies Requested:**
+  % for remedy in t1_remedies.true_values():
+  - ${ remedy }
+  % endfor
+field: review_complete
+buttons:
+  - Generate T1: continue
+  - Start Over: restart
+---
+mandatory: True
+question: |
+  ## Your T1 Application is Ready
+subquestion: |
+  **Next Steps:**
+
+  1. Download your completed T1 form
+  2. File with the LTB online or in person
+  3. Pay the LTB filing fee ($53)
+  4. Serve a copy on your landlord
+  5. Attend the hearing with your evidence
+
+  ${ disclaimer_template }
+buttons:
+  - Download PDF: exit
+    url: https://yourlegalaid.ca/thank-you/
+  - Start Another Form: restart
