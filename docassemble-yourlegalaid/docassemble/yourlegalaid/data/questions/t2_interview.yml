@@ -122,20 +122,65 @@ buttons:
   - Generate T2: continue
   - Start Over: restart
 ---
+attachment:
+  name: T2 Application – ${ tenant.name }
+  filename: T2_${ tenant.name.last }_${ tenant.name.first }
+  pdf template file: T2.pdf
+  editable: False
+  variable name: t2_attachment
+  fields:
+    - "TFirstName1[0]": ${ tenant.name.first }
+    - "TLastName1[0]": ${ tenant.name.last }
+    - "TAddress[0]": ${ rental_unit.address }${ ', Unit ' + rental_unit.unit if rental_unit.unit else '' }
+    - "TMunicipality[0]": ${ rental_unit.city }
+    - "TProvince[0]": ${ rental_unit.province }
+    - "TPostalCode[0]": ${ rental_unit.postal_code }
+    - "TDayPhone[0]": ${ tenant.phone if defined('tenant.phone') else '' }
+    - "Temail[0]": ${ tenant.email if defined('tenant.email') else '' }
+    - "LFirstName[0]": ${ landlord.name.first }
+    - "LLastName[0]": ${ landlord.name.last }
+    - "LAddress[0]": ${ landlord.address }
+    - "LMunicipality[0]": ${ landlord.city }
+    - "LProvince[0]": Ontario
+    - "LPostalCode[0]": ${ landlord.postal_code }
+    - "LDayPhone[0]": ${ landlord.phone if defined('landlord.phone') else '' }
+    - "StreetNumber[0]": ${ rental_unit.address.split(' ')[0] if ' ' in rental_unit.address else '' }
+    - "StreetName[0]": ${ ' '.join(rental_unit.address.split(' ')[1:]) if ' ' in rental_unit.address else rental_unit.address }
+    - "Unit[0]": ${ rental_unit.unit if defined('rental_unit.unit') and rental_unit.unit else '' }
+    - "Municipality[0]": ${ rental_unit.city }
+    - "PostalCode[0]": ${ rental_unit.postal_code }
+    - "MoveInDate[0]": ${ tenancy_start_date }
+    - "Reason1[0]": ${ 'Entered the rental unit without proper notice or consent' in t2_reasons.true_values() }
+    - "Reason2[0]": ${ 'Changed the locks or withheld a key' in t2_reasons.true_values() }
+    - "Reason3[0]": ${ 'Harassed, threatened, or coerced the tenant' in t2_reasons.true_values() }
+    - "Reason4[0]": ${ "Substantially interfered with the tenant's reasonable enjoyment" in t2_reasons.true_values() }
+    - "Reason5[0]": ${ 'Withheld vital services (heat, hydro, water, gas)' in t2_reasons.true_values() }
+    - "Reason6[0]": ${ 'Attempted an illegal eviction' in t2_reasons.true_values() }
+    - "ReasonDetail[0]": ${ incident_description[:500] }
+    - "ReasonNum[0]": ${ most_recent_date }
+    - "Remedy1[0]": ${ 'An order that the landlord stop the behaviour' in t2_remedies.true_values() }
+    - "Remedy2[0]": ${ 'A rent abatement (reduction in rent for the period affected)' in t2_remedies.true_values() }
+    - "Remedy5[0]": ${ 'An order for the landlord to pay damages' in t2_remedies.true_values() }
+    - "Remedy5Amount[0]": ${ "%.2f" % damages_amount if defined('damages_amount') and damages_amount else '' }
+    - "Remedy7[0]": ${ 'An administrative fine against the landlord' in t2_remedies.true_values() }
+    - "Remedy10[0]": ${ 'Authorization to change the locks' in t2_remedies.true_values() }
+    - "SignatureDate[0]": ${ today() }
+    - "landlord_signature[0]": ${ tenant.name }
+---
 mandatory: True
 question: |
   ## Your T2 Application is Ready
 subquestion: |
   **Next Steps:**
 
-  1. Download your completed T2 form
+  1. Download your completed T2 form below
   2. File with the LTB online or in person
   3. Pay the LTB filing fee ($53)
   4. Serve a copy on your landlord
   5. Attend the hearing with your evidence
 
+  ${ t2_attachment }
+
   ${ disclaimer_template }
 buttons:
-  - Download PDF: exit
-    url: https://yourlegalaid.ca/thank-you/
   - Start Another Form: restart

@@ -113,6 +113,49 @@ buttons:
   - Generate L1: continue
   - Start Over: restart
 ---
+code: |
+  net_arrears = total_arrears - (partial_payment_amount if partial_payments else 0)
+---
+attachment:
+  name: L1 Application – ${ tenant.name }
+  filename: L1_${ tenant.name.last }_${ tenant.name.first }
+  pdf template file: L1.pdf
+  editable: False
+  variable name: l1_attachment
+  fields:
+    - "LFirstName[0]": ${ landlord.name.first }
+    - "LLastName[0]": ${ landlord.name.last }
+    - "LAddress[0]": ${ landlord.address }
+    - "LMunicipality[0]": ${ landlord.city }
+    - "LProvince[0]": Ontario
+    - "LPostalCode[0]": ${ landlord.postal_code }
+    - "LDayPhone[0]": ${ landlord.phone if defined('landlord.phone') else '' }
+    - "Lemail[0]": ${ landlord.email if defined('landlord.email') else '' }
+    - "TFirstName1[0]": ${ tenant.name.first }
+    - "TLastName1[0]": ${ tenant.name.last }
+    - "TAddress[0]": ${ rental_unit.address }${ ', Unit ' + rental_unit.unit if rental_unit.unit else '' }
+    - "TMunicipality[0]": ${ rental_unit.city }
+    - "TProvince[0]": ${ rental_unit.province }
+    - "TPostalCode[0]": ${ rental_unit.postal_code }
+    - "StreetNumber[0]": ${ rental_unit.address.split(' ')[0] if ' ' in rental_unit.address else '' }
+    - "StreetName[0]": ${ ' '.join(rental_unit.address.split(' ')[1:]) if ' ' in rental_unit.address else rental_unit.address }
+    - "Unit[0]": ${ rental_unit.unit if defined('rental_unit.unit') and rental_unit.unit else '' }
+    - "Municipality[0]": ${ rental_unit.city }
+    - "PostalCode[0]": ${ rental_unit.postal_code }
+    - "ArrearFrom1[0]": ${ n4_service_date }
+    - "ArrearTo1[0]": ${ today() }
+    - "RentCharge1[0]": ${ "%.2f" % total_arrears }
+    - "RentPaid1[0]": ${ "%.2f" % partial_payment_amount if partial_payments else '0.00' }
+    - "RentOwe1[0]": ${ "%.2f" % net_arrears }
+    - "TotalRentOwe[0]": ${ "%.2f" % net_arrears }
+    - "TotalOwe[0]": ${ "%.2f" % net_arrears }
+    - "ApplicationFee[0]": "201.00"
+    - "TotalAmountOwe[0]": ${ "%.2f" % (net_arrears + 201) }
+    - "Reason1[0]": True
+    - "CheckL1[0]": True
+    - "SignName[0]": ${ landlord.name }
+    - "ReprSignDate[0]": ${ today() }
+---
 mandatory: True
 question: |
   ## Your L1 Application is Ready
@@ -121,12 +164,12 @@ subquestion: |
 
   1. Download and file with the LTB ($201 filing fee)
   2. Serve a copy on the tenant
-  3. Attend the hearing — bring your N4, proof of service, and rent ledger
+  3. Attend the hearing �� bring your N4, proof of service, and rent ledger
   4. The tenant can void the L1 by paying all arrears + filing fee before
      the hearing
 
+  ${ l1_attachment }
+
   ${ disclaimer_template }
 buttons:
-  - Download PDF: exit
-    url: https://yourlegalaid.ca/thank-you/
   - Start Another Form: restart

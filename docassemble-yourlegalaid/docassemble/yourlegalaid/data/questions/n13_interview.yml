@@ -113,6 +113,29 @@ buttons:
   - Generate N13: continue
   - Start Over: restart
 ---
+attachment:
+  name: N13 Notice – ${ tenant.name }
+  filename: N13_${ tenant.name.last }_${ tenant.name.first }
+  pdf template file: N13.pdf
+  editable: False
+  variable name: n13_attachment
+  fields:
+    - "TO_TenameName[0]": ${ tenant.name }
+    - "RentalUnitAddress[0]": ${ rental_unit.address + (", Unit " + rental_unit.unit if rental_unit.unit else "") + ", " + rental_unit.city + ", " + rental_unit.province + " " + rental_unit.postal_code }
+    - "From_LandlordName[0]": ${ landlord.name }
+    - "RFirstName[0]": ${ landlord.name.first }
+    - "RLastName[0]": ${ landlord.name.last }
+    - "RDayPhone[0]": ""
+    - "Reason1[0]": ${ n13_reason == "Demolition of the rental unit or building" }
+    - "Reason2[0]": ${ n13_reason == "Conversion to non-residential use" }
+    - "Reason3[0]": ${ n13_reason == "Extensive repairs or renovations requiring vacant possession" }
+    - "NecessaryPermits[0]": ${ has_permit }
+    - "WorkPlan[0]": ${ work_description }
+    - "WorkDetail[0]": ${ permit_number if has_permit else "" }
+    - "TerminationDate[0]": ${ termination_date }
+    - "SignDate[0]": ${ today() }
+    - "Signature[0]": ${ landlord.name }
+---
 mandatory: True
 question: |
   ## Your N13 Notice is Ready
@@ -124,8 +147,8 @@ subquestion: |
   3. The tenant has a **right of first refusal** to move back in after
      repairs are completed (at the same rent)
 
+  ${ n13_attachment }
+
   ${ disclaimer_template }
 buttons:
-  - Download PDF: exit
-    url: https://yourlegalaid.ca/thank-you/
   - Start Another Form: restart

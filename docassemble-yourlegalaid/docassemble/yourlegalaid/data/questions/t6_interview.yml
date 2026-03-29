@@ -123,19 +123,56 @@ buttons:
   - Generate T6: continue
   - Start Over: restart
 ---
+attachment:
+  name: T6 Application – ${ tenant.name }
+  filename: T6_${ tenant.name.last }_${ tenant.name.first }
+  pdf template file: T6.pdf
+  editable: False
+  variable name: t6_attachment
+  fields:
+    - "TFirstName1[0]": ${ tenant.name.first }
+    - "TLastName1[0]": ${ tenant.name.last }
+    - "TAddress[0]": ${ rental_unit.address }${ ', Unit ' + rental_unit.unit if rental_unit.unit else '' }
+    - "TMunicipality[0]": ${ rental_unit.city }
+    - "TProvince[0]": ${ rental_unit.province }
+    - "TPostalCode[0]": ${ rental_unit.postal_code }
+    - "TDayPhone[0]": ${ tenant.phone if defined('tenant.phone') else '' }
+    - "Temail[0]": ${ tenant.email if defined('tenant.email') else '' }
+    - "LFirstName[0]": ${ landlord.name.first }
+    - "LLastName[0]": ${ landlord.name.last }
+    - "LAddress[0]": ${ landlord.address }
+    - "LMunicipality[0]": ${ landlord.city }
+    - "LProvince[0]": Ontario
+    - "LPostalCode[0]": ${ landlord.postal_code }
+    - "StreetNumber[0]": ${ rental_unit.address.split(' ')[0] if ' ' in rental_unit.address else '' }
+    - "StreetName[0]": ${ ' '.join(rental_unit.address.split(' ')[1:]) if ' ' in rental_unit.address else rental_unit.address }
+    - "Unit[0]": ${ rental_unit.unit if defined('rental_unit.unit') and rental_unit.unit else '' }
+    - "Municipality[0]": ${ rental_unit.city }
+    - "PostalCode[0]": ${ rental_unit.postal_code }
+    - "MoveInDate[0]": ${ tenancy_start_date }
+    - "FirstComplainDate[0]": ${ report_date if defined('report_date') and reported_to_landlord else '' }
+    - "Part2ReasonDetail[0]": ${ maintenance_description[:500] }
+    - "Remedy1[0]": ${ 'An order requiring the landlord to do the repairs' in t6_remedies.true_values() }
+    - "Remedy2[0]": ${ 'A rent abatement for the period the problem existed' in t6_remedies.true_values() }
+    - "Remedy3[0]": ${ 'An order for the landlord to pay damages' in t6_remedies.true_values() }
+    - "Remedy5[0]": ${ 'An administrative fine against the landlord' in t6_remedies.true_values() }
+    - "Remedy7[0]": ${ 'Authorization to hire a contractor and deduct cost from rent' in t6_remedies.true_values() }
+    - "SignatureDate[0]": ${ today() }
+    - "landlord_signature[0]": ${ tenant.name }
+---
 mandatory: True
 question: |
   ## Your T6 Application is Ready
 subquestion: |
   **Next Steps:**
 
-  1. Download your completed T6 form
+  1. Download your completed T6 form below
   2. File with the LTB ($53 filing fee)
   3. Serve a copy on your landlord
   4. Bring photos, work orders, and correspondence to the hearing
 
+  ${ t6_attachment }
+
   ${ disclaimer_template }
 buttons:
-  - Download PDF: exit
-    url: https://yourlegalaid.ca/thank-you/
   - Start Another Form: restart

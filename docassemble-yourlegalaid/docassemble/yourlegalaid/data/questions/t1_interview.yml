@@ -125,20 +125,59 @@ buttons:
   - Generate T1: continue
   - Start Over: restart
 ---
+attachment:
+  name: T1 Application – ${ tenant.name }
+  filename: T1_${ tenant.name.last }_${ tenant.name.first }
+  pdf template file: T1.pdf
+  editable: False
+  variable name: t1_attachment
+  fields:
+    - "TFirstName1[0]": ${ tenant.name.first }
+    - "TLastName1[0]": ${ tenant.name.last }
+    - "TAddress[0]": ${ rental_unit.address }${ ', Unit ' + rental_unit.unit if rental_unit.unit else '' }
+    - "TMunicipality[0]": ${ rental_unit.city }
+    - "TProvince[0]": ${ rental_unit.province }
+    - "TPostalCode[0]": ${ rental_unit.postal_code }
+    - "TDayPhone[0]": ${ tenant.phone if defined('tenant.phone') else '' }
+    - "Temail[0]": ${ tenant.email if defined('tenant.email') else '' }
+    - "LFirstName[0]": ${ landlord.name.first }
+    - "LLastName[0]": ${ landlord.name.last }
+    - "LAddress[0]": ${ landlord.address }
+    - "LMunicipality[0]": ${ landlord.city }
+    - "LProvince[0]": Ontario
+    - "LPostalCode[0]": ${ landlord.postal_code }
+    - "LDayPhone[0]": ${ landlord.phone if defined('landlord.phone') else '' }
+    - "StreetNumber[0]": ${ rental_unit.address.split(' ')[0] if ' ' in rental_unit.address else '' }
+    - "StreetName[0]": ${ ' '.join(rental_unit.address.split(' ')[1:]) if ' ' in rental_unit.address else rental_unit.address }
+    - "Unit[0]": ${ rental_unit.unit if defined('rental_unit.unit') and rental_unit.unit else '' }
+    - "Municipality[0]": ${ rental_unit.city }
+    - "PostalCode[0]": ${ rental_unit.postal_code }
+    - "MoveInDate[0]": ${ tenancy_start_date }
+    - "Reason1[0]": ${ 'Charged rent above the lawful amount (illegal rent increase)' in t1_reasons.true_values() }
+    - "Reason2[0]": ${ "Collected a rent deposit exceeding one month's rent" in t1_reasons.true_values() }
+    - "Reason3[0]": ${ "Failed to pay interest on the last month's rent deposit" in t1_reasons.true_values() }
+    - "Reason4[0]": ${ 'Retained the rent deposit after move-out without justification' in t1_reasons.true_values() }
+    - "Reason5[0]": ${ 'Charged fees not allowed under the RTA (e.g., admin fee, key deposit above cost)' in t1_reasons.true_values() }
+    - "Reason6[0]": ${ 'Collected an illegal charge related to the tenancy' in t1_reasons.true_values() }
+    - "P2LandlordPayMe[0]": ${ "%.2f" % illegal_amount }
+    - "ReasonDetail[0]": ${ collection_dates[:500] }
+    - "SignatureDate[0]": ${ today() }
+    - "landlord_signature[0]": ${ tenant.name }
+---
 mandatory: True
 question: |
   ## Your T1 Application is Ready
 subquestion: |
   **Next Steps:**
 
-  1. Download your completed T1 form
+  1. Download your completed T1 form below
   2. File with the LTB online or in person
   3. Pay the LTB filing fee ($53)
   4. Serve a copy on your landlord
   5. Attend the hearing with your evidence
 
+  ${ t1_attachment }
+
   ${ disclaimer_template }
 buttons:
-  - Download PDF: exit
-    url: https://yourlegalaid.ca/thank-you/
   - Start Another Form: restart

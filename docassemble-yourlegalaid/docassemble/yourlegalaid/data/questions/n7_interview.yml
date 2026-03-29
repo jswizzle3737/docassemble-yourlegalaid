@@ -94,6 +94,29 @@ buttons:
   - Generate N7: continue
   - Start Over: restart
 ---
+attachment:
+  name: N7 Notice – ${ tenant.name }
+  filename: N7_${ tenant.name.last }_${ tenant.name.first }
+  pdf template file: N7.pdf
+  editable: False
+  variable name: n7_attachment
+  fields:
+    - "TO_TenameName[0]": ${ tenant.name }
+    - "RentalUnitAddress[0]": ${ rental_unit.address }${ ', Unit ' + rental_unit.unit if rental_unit.unit else '' }, ${ rental_unit.city }, ${ rental_unit.province } ${ rental_unit.postal_code }
+    - "From_LandlordName[0]": ${ landlord.name }
+    - "RFirstName[0]": ${ landlord.name.first }
+    - "RLastName[0]": ${ landlord.name.last }
+    - "RDayPhone[0]": ''
+    - "Reason1[0]": ${ n7_reason == 'Caused serious damage to the rental unit or building' }
+    - "Reason2[0]": ${ n7_reason == 'Used the rental unit for an illegal purpose' }
+    - "Reason3[0]": ${ n7_reason == 'Seriously impaired the safety of another person' }
+    - "Reason4[0]": ${ n7_reason == 'Permitted an illegal act in the rental unit' }
+    - "EventDateTime1[0]": ${ incident_date }
+    - "Event1[0]": ${ incident_description[:500] }
+    - "TerminationDate[0]": ${ termination_date }
+    - "SignDate[0]": ${ today() }
+    - "Signature[0]": ${ landlord.name }
+---
 mandatory: True
 question: |
   ## Your N7 Notice is Ready
@@ -105,8 +128,8 @@ subquestion: |
      after the termination date
   3. Keep all evidence and the police report (if any) for the hearing
 
+  ${ n7_attachment }
+
   ${ disclaimer_template }
 buttons:
-  - Download PDF: exit
-    url: https://yourlegalaid.ca/thank-you/
   - Start Another Form: restart

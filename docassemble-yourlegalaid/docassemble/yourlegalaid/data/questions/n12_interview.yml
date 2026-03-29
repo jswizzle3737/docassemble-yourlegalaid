@@ -104,6 +104,25 @@ buttons:
   - Generate N12: continue
   - Start Over: restart
 ---
+attachment:
+  name: N12 Notice – ${ tenant.name }
+  filename: N12_${ tenant.name.last }_${ tenant.name.first }
+  pdf template file: N12.pdf
+  editable: False
+  variable name: n12_attachment
+  fields:
+    - "TO_TenameName[0]": ${ tenant.name }
+    - "RentalUnitAddress[0]": ${ rental_unit.address }${ ', Unit ' + rental_unit.unit if rental_unit.unit else '' }, ${ rental_unit.city }, ${ rental_unit.province } ${ rental_unit.postal_code }
+    - "From_LandlordName[0]": ${ landlord.name }
+    - "RFirstName[0]": ${ landlord.name.first }
+    - "RLastName[0]": ${ landlord.name.last }
+    - "RDayPhone[0]": ''
+    - "Reason1[0]": ${ n12_person in ['The landlord (myself)', "Landlord's spouse", "Landlord's child", "Landlord's parent", 'A caregiver for the landlord or family member'] }
+    - "Reason2[0]": ${ n12_person in ['A purchaser of the property', "A purchaser's spouse, child, or parent"] }
+    - "TerminationDate[0]": ${ termination_date }
+    - "SignDate[0]": ${ today() }
+    - "Signature[0]": ${ landlord.name }
+---
 mandatory: True
 question: |
   ## Your N12 Notice is Ready
@@ -115,8 +134,8 @@ subquestion: |
   3. The person named must actually move in and live there for at least **12 months**
   4. Bad faith N12 evictions carry penalties up to **$35,000** under the RTA
 
+  ${ n12_attachment }
+
   ${ disclaimer_template }
 buttons:
-  - Download PDF: exit
-    url: https://yourlegalaid.ca/thank-you/
   - Start Another Form: restart

@@ -129,6 +129,29 @@ buttons:
   - Generate N5: continue
   - Start Over: restart
 ---
+attachment:
+  name: N5 Notice – ${ tenant.name }
+  filename: N5_${ tenant.name.last }_${ tenant.name.first }
+  pdf template file: N5.pdf
+  editable: False
+  variable name: n5_attachment
+  fields:
+    - "TO_TenameName[0]": ${ tenant.name }
+    - "RentalUnitAddress[0]": ${ rental_unit.address }${ ', Unit ' + rental_unit.unit if rental_unit.unit else '' }, ${ rental_unit.city }, ${ rental_unit.province } ${ rental_unit.postal_code }
+    - "From_LandlordName[0]": ${ landlord.name }
+    - "RFirstName[0]": ${ landlord.name.first }
+    - "RLastName[0]": ${ landlord.name.last }
+    - "RDayPhone[0]": ${ landlord.phone if defined('landlord.phone') else '' }
+    - "Reason1[0]": ${ 'Substantially interfered with reasonable enjoyment of other tenants' in n5_reasons.true_values() or 'Substantially interfered with a lawful right, privilege, or interest of the landlord' in n5_reasons.true_values() }
+    - "Reason2[0]": ${ 'Caused wilful or negligent damage to the rental unit' in n5_reasons.true_values() or 'Caused wilful or negligent damage to the residential complex' in n5_reasons.true_values() }
+    - "Reason3[0]": ${ 'Too many persons living in the unit (overcrowding)' in n5_reasons.true_values() }
+    - "EventDateTime1[0]": ${ most_recent_incident_date }
+    - "Event1[0]": ${ incident_description[:500] }
+    - "PayMe1[0]": ${ "%.2f" % damage_cost if has_damage else '' }
+    - "TerminationDate[0]": ${ termination_date }
+    - "SignDate[0]": ${ today() }
+    - "Signature[0]": ${ landlord.name }
+---
 mandatory: True
 question: |
   ## Your N5 Notice is Ready
@@ -142,8 +165,8 @@ subquestion: |
   4. If the tenant repeats the behaviour within 6 months, serve an
      [N8 Notice](https://yourlegalaid.ca/forms-n8/)
 
+  ${ n5_attachment }
+
   ${ disclaimer_template }
 buttons:
-  - Download PDF: exit
-    url: https://yourlegalaid.ca/thank-you/
   - Start Another Form: restart

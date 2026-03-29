@@ -95,6 +95,28 @@ buttons:
   - Generate N8: continue
   - Start Over: restart
 ---
+attachment:
+  name: N8 Notice – ${ tenant.name }
+  filename: N8_${ tenant.name.last }_${ tenant.name.first }
+  pdf template file: N8.pdf
+  editable: False
+  variable name: n8_attachment
+  fields:
+    - "TO_TenameName[0]": ${ tenant.name }
+    - "RentalUnitAddress[0]": ${ rental_unit.address }${ ', Unit ' + rental_unit.unit if rental_unit.unit else '' }, ${ rental_unit.city }, ${ rental_unit.province } ${ rental_unit.postal_code }
+    - "From_LandlordName[0]": ${ landlord.name }
+    - "RFirstName[0]": ${ landlord.name.first }
+    - "RLastName[0]": ${ landlord.name.last }
+    - "RDayPhone[0]": ''
+    - "Reason1[0]": ${ n8_reason == 'Persistently paid rent late' }
+    - "Reason2[0]": ${ n8_reason == 'Repeated N5 behaviour within 6 months of a previous N5' }
+    - "Reason3[0]": ${ n8_reason == 'Repeated safety impairment (repeat offence)' }
+    - "Reason4[0]": ${ n8_reason == 'Gave false income information (rent-geared-to-income unit)' }
+    - "NoticeDetail[0]": ${ n8_details[:1000] }
+    - "TerminationDate[0]": ${ termination_date }
+    - "SignDate[0]": ${ today() }
+    - "Signature[0]": ${ landlord.name }
+---
 mandatory: True
 question: |
   ## Your N8 Notice is Ready
@@ -105,8 +127,8 @@ subquestion: |
   2. After the termination date, file an [L2 Application](https://yourlegalaid.ca/forms-l2/)
   3. Keep records of all late payments or prior N5 notices
 
+  ${ n8_attachment }
+
   ${ disclaimer_template }
 buttons:
-  - Download PDF: exit
-    url: https://yourlegalaid.ca/thank-you/
   - Start Another Form: restart

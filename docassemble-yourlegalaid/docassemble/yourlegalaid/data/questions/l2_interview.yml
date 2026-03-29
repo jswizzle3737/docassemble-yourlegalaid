@@ -107,6 +107,43 @@ buttons:
   - Generate L2: continue
   - Start Over: restart
 ---
+attachment:
+  name: L2 Application – ${ tenant.name }
+  filename: L2_${ tenant.name.last }_${ tenant.name.first }
+  pdf template file: L2.pdf
+  editable: False
+  variable name: l2_attachment
+  fields:
+    - "LFirstName[0]": ${ landlord.name.first }
+    - "LLastName[0]": ${ landlord.name.last }
+    - "LAddress[0]": ${ landlord.address }
+    - "LMunicipality[0]": ${ landlord.city }
+    - "LProvince[0]": Ontario
+    - "LPostalCode[0]": ${ landlord.postal_code }
+    - "LDayPhone[0]": ${ landlord.phone if defined('landlord.phone') else '' }
+    - "TFirstName1[0]": ${ tenant.name.first }
+    - "TLastName1[0]": ${ tenant.name.last }
+    - "TAddress[0]": ${ rental_unit.address }${ ', Unit ' + rental_unit.unit if rental_unit.unit else '' }
+    - "TMunicipality[0]": ${ rental_unit.city }
+    - "TProvince[0]": ${ rental_unit.province }
+    - "TPostalCode[0]": ${ rental_unit.postal_code }
+    - "StreetNumber[0]": ${ rental_unit.address.split(' ')[0] if ' ' in rental_unit.address else '' }
+    - "StreetName[0]": ${ ' '.join(rental_unit.address.split(' ')[1:]) if ' ' in rental_unit.address else rental_unit.address }
+    - "Unit[0]": ${ rental_unit.unit if defined('rental_unit.unit') and rental_unit.unit else '' }
+    - "Municipality[0]": ${ rental_unit.city }
+    - "PostalCode[0]": ${ rental_unit.postal_code }
+    - "NoticeDate[0]": ${ notice_service_date }
+    - "CReason1[0]": ${ 'N5' in prior_notice_type }
+    - "CReason2[0]": ${ 'N7' in prior_notice_type }
+    - "CReason3[0]": ${ 'N8' in prior_notice_type }
+    - "CPart3_1[0]": ${ 'N12' in prior_notice_type }
+    - "CPart3_2[0]": ${ 'N13' in prior_notice_type }
+    - "Reason2Detail[0]": ${ l2_details[:500] }
+    - "ApplicationFee[0]": "201.00"
+    - "DamageCost[0]": ${ "%.2f" % l2_damages if defined('l2_damages') and l2_damages else '' }
+    - "SignName[0]": ${ landlord.name }
+    - "ReprSignDate[0]": ${ today() }
+---
 mandatory: True
 question: |
   ## Your L2 Application is Ready
@@ -118,8 +155,8 @@ subquestion: |
   3. Attend the hearing — bring the original notice, proof of service,
      and all supporting evidence
 
+  ${ l2_attachment }
+
   ${ disclaimer_template }
 buttons:
-  - Download PDF: exit
-    url: https://yourlegalaid.ca/thank-you/
   - Start Another Form: restart

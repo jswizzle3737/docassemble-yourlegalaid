@@ -144,6 +144,40 @@ buttons:
   - Generate N4: continue
   - Start Over: restart
 ---
+attachment:
+  name: N4 Notice – ${ tenant.name }
+  filename: N4_${ tenant.name.last }_${ tenant.name.first }
+  pdf template file: N4.pdf
+  editable: False
+  variable name: n4_attachment
+  fields:
+    - "TO_TenameName[0]": ${ tenant.name }
+    - "RentalUnitAddress[0]": ${ rental_unit.address }${ ', Unit ' + rental_unit.unit if rental_unit.unit else '' }, ${ rental_unit.city }, ${ rental_unit.province } ${ rental_unit.postal_code }
+    - "From_LandlordName[0]": ${ landlord.name }
+    - "RFirstName[0]": ${ landlord.name.first }
+    - "RLastName[0]": ${ landlord.name.last }
+    - "RDayPhone[0]": ${ landlord.phone if defined('landlord.phone') else '' }
+    - "ArrearFrom1[0]": ${ rent_periods[0].from_date if len(rent_periods) > 0 else '' }
+    - "ArrearTo1[0]": ${ rent_periods[0].to_date if len(rent_periods) > 0 else '' }
+    - "RentCharge1[0]": ${ "%.2f" % rent_periods[0].rent_charged if len(rent_periods) > 0 else '' }
+    - "RentPaid1[0]": ${ "%.2f" % rent_periods[0].rent_paid if len(rent_periods) > 0 else '' }
+    - "RentOwe1[0]": ${ "%.2f" % (rent_periods[0].rent_charged - rent_periods[0].rent_paid) if len(rent_periods) > 0 else '' }
+    - "ArrearFrom2[0]": ${ rent_periods[1].from_date if len(rent_periods) > 1 else '' }
+    - "ArrearTo2[0]": ${ rent_periods[1].to_date if len(rent_periods) > 1 else '' }
+    - "RentCharge2[0]": ${ "%.2f" % rent_periods[1].rent_charged if len(rent_periods) > 1 else '' }
+    - "RentPaid2[0]": ${ "%.2f" % rent_periods[1].rent_paid if len(rent_periods) > 1 else '' }
+    - "RentOwe2[0]": ${ "%.2f" % (rent_periods[1].rent_charged - rent_periods[1].rent_paid) if len(rent_periods) > 1 else '' }
+    - "ArrearFrom3[0]": ${ rent_periods[2].from_date if len(rent_periods) > 2 else '' }
+    - "ArrearTo3[0]": ${ rent_periods[2].to_date if len(rent_periods) > 2 else '' }
+    - "RentCharge3[0]": ${ "%.2f" % rent_periods[2].rent_charged if len(rent_periods) > 2 else '' }
+    - "RentPaid3[0]": ${ "%.2f" % rent_periods[2].rent_paid if len(rent_periods) > 2 else '' }
+    - "RentOwe3[0]": ${ "%.2f" % (rent_periods[2].rent_charged - rent_periods[2].rent_paid) if len(rent_periods) > 2 else '' }
+    - "TotalRentOwe[0]": ${ "%.2f" % total_rent_owed }
+    - "OweMeAmount[0]": ${ "%.2f" % total_rent_owed }
+    - "PayDate[0]": ${ termination_date }
+    - "SignDate[0]": ${ today() }
+    - "Signature[0]": ${ landlord.name }
+---
 mandatory: True
 question: |
   ## Your N4 Notice is Ready
@@ -153,14 +187,14 @@ question: |
 subquestion: |
   **Next Steps:**
 
-  1. Download your completed N4 form
+  1. Download your completed N4 form below
   2. Serve the notice on your tenant using: *${ service_method }*
   3. Keep a copy for your records
   4. If the tenant does not pay by ${ termination_date }, you may file
      an [L1 Application](https://yourlegalaid.ca/forms-l1/) with the LTB
 
+  ${ n4_attachment }
+
   ${ disclaimer_template }
 buttons:
-  - Download PDF: exit
-    url: https://yourlegalaid.ca/thank-you/
   - Start Another Form: restart
